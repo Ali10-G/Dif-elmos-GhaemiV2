@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>راهنمای معادلات دیفرانسیل</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="theme-light">
+  <header class="app-header">
+    <div>
+      <h1>دستیار هوشمند معادلات دیفرانسیل</h1>
+      <p class="subtitle">یادگیری گام‌به‌گام برای دانشجویان درس استاد قائمی</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="تغییر تم">
+      <span class="icon">🌞</span>
+      <span class="label">تم روز</span>
+    </button>
+  </header>
+  <main class="app-layout">
+    <section class="panel input-panel">
+      <h2>معادله خودت را وارد کن</h2>
+      <p class="panel-description">فرمت پیشنهادی: <span class="equation-text">dy/dx = عبارت</span></p>
+      <label for="equationInput" class="visually-hidden">معادله دیفرانسیل</label>
+      <textarea id="equationInput" class="equation-input" placeholder="مثال: dy/dx = x * y"></textarea>
+      <div class="keyboard-container" id="keyboard"></div>
+      <div class="initial-conditions">
+        <div class="field">
+          <label for="initialX">مقدار x₀ (اختیاری)</label>
+          <input type="number" id="initialX" placeholder="مثلاً 0" />
+        </div>
+        <div class="field">
+          <label for="initialY">مقدار y₀ (اختیاری)</label>
+          <input type="number" id="initialY" placeholder="مثلاً 1" />
+        </div>
+      </div>
+    </section>
+    <section class="panel actions-panel">
+      <h2>دستورات</h2>
+      <div class="buttons">
+        <button id="hintButton" class="primary">راهنمای روش حل</button>
+        <button id="stepButton" class="secondary">حل مرحله به مرحله</button>
+        <button id="fullButton" class="outline">نمایش حل کامل</button>
+        <button id="resetButton" class="ghost">پاکسازی و شروع دوباره</button>
+      </div>
+      <div class="status" id="statusMessage"></div>
+    </section>
+    <section class="panel solution-panel">
+      <h2>خروجی و توضیحات</h2>
+      <div id="hintOutput" class="hint-box hidden"></div>
+      <div id="stepOutput" class="steps"></div>
+    </section>
+    <section class="panel chart-panel">
+      <h2>نمایش نموداری</h2>
+      <p class="panel-description">پس از تکمیل حل، نمودار تقریبی با روش رانگه-کوتا رسم می‌شود.</p>
+      <canvas id="solutionChart" width="600" height="360" aria-label="نمودار تابع" role="img"></canvas>
+      <div id="chartNotice" class="chart-notice"></div>
+    </section>
+    <section class="panel about-panel">
+      <h2>درباره این پروژه</h2>
+      <p>من <strong>دانشجوی درس معادلات دیفرانسیل استاد قائمی</strong> هستم و این ابزار را برای دوستانم آماده کرده‌ام تا بتوانیم با هم بهتر یاد بگیریم. اگر خواستید با من در ارتباط باشید، می‌توانید از طریق ایمیل <a href="mailto:student@example.com">student@example.com</a> پیام بدهید.</p>
+      <p>این پروژه با کمک دستیار <strong>gpt-5-codex</strong> ساخته شده تا تجربه‌ای مدرن، مینیمال و آموزشی برای شما فراهم کند.</p>
+    </section>
+  </main>
+  <footer class="app-footer">
+    <p>نسخه اولیه &mdash; بازخورد شما باعث بهتر شدن ما می‌شود.</p>
+  </footer>
+  <script type="module" src="./scripts/app.js"></script>
+</body>
+</html>
