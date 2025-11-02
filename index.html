@@ -4,7 +4,349 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>راهنمای معادلات دیفرانسیل</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+:root {
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --text: #202124;
+  --text-muted: #5f6368;
+  --accent: #4c6ef5;
+  --accent-soft: rgba(76, 110, 245, 0.12);
+  --border: rgba(32, 33, 36, 0.12);
+  --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-dark {
+  --bg: #0f172a;
+  --surface: #15213b;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #7c3aed;
+  --accent-soft: rgba(124, 58, 237, 0.22);
+  --border: rgba(148, 163, 184, 0.24);
+  --shadow: 0 12px 32px rgba(8, 47, 73, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 5vw 1.5rem;
+  gap: 1.5rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0 5vw 3rem;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 1.8rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.panel h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.panel-description {
+  margin-top: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.equation-text {
+  direction: ltr;
+  display: inline-block;
+  background: var(--accent-soft);
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+}
+
+.equation-input {
+  width: 100%;
+  min-height: 110px;
+  padding: 1rem;
+  font-size: 1.05rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  direction: ltr;
+  resize: vertical;
+}
+
+.equation-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.keyboard-container {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(52px, 1fr));
+  gap: 0.5rem;
+}
+
+.virtual-key {
+  padding: 0.6rem 0.4rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.virtual-key:active {
+  transform: translateY(2px);
+}
+
+.initial-conditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.95rem;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(76, 110, 245, 0.25);
+}
+
+button.secondary {
+  background: rgba(76, 110, 245, 0.16);
+  color: var(--accent);
+}
+
+button.outline {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.status {
+  min-height: 1.5rem;
+  margin-top: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.hint-box {
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(76, 110, 245, 0.25);
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step-item {
+  background: rgba(15, 23, 42, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  line-height: 1.9;
+}
+
+body.theme-dark .step-item {
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.step-item h3 {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+}
+
+.step-item .equation-line {
+  direction: ltr;
+  font-family: 'SFMono-Regular', 'Courier New', monospace;
+  background: rgba(148, 163, 184, 0.12);
+  color: inherit;
+  padding: 0.4rem 0.6rem;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.chart-panel canvas {
+  width: 100%;
+  max-width: 100%;
+  background: var(--bg);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.chart-notice {
+  margin-top: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.about-panel a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.about-panel a:hover {
+  text-decoration: underline;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1.5rem 5vw 2.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  color: var(--text);
+}
+
+.theme-toggle .icon {
+  font-size: 1.2rem;
+}
+
+.theme-toggle .label {
+  font-size: 0.9rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .buttons {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -68,6 +410,1671 @@
   <footer class="app-footer">
     <p>نسخه اولیه &mdash; بازخورد شما باعث بهتر شدن ما می‌شود.</p>
   </footer>
-  <script type="module" src="./scripts/app.js"></script>
+  <script type="module">
+const STORAGE_KEY = 'ode-theme-preference';
+
+function initThemeToggle(button) {
+  if (!button) return;
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  const initialTheme = stored || (prefersDark ? 'dark' : 'light');
+  applyTheme(initialTheme, button);
+  button.addEventListener('click', () => {
+    const nextTheme = document.body.classList.contains('theme-dark') ? 'light' : 'dark';
+    applyTheme(nextTheme, button);
+    localStorage.setItem(STORAGE_KEY, nextTheme);
+  });
+}
+
+function applyTheme(theme, button) {
+  if (theme === 'dark') {
+    document.body.classList.remove('theme-light');
+    document.body.classList.add('theme-dark');
+    button.querySelector('.icon').textContent = '🌙';
+    button.querySelector('.label').textContent = 'تم شب';
+  } else {
+    document.body.classList.remove('theme-dark');
+    document.body.classList.add('theme-light');
+    button.querySelector('.icon').textContent = '🌞';
+    button.querySelector('.label').textContent = 'تم روز';
+  }
+}
+
+
+const KEY_LAYOUT = [
+  [
+    { label: 'dy/dx', value: 'dy/dx', cursorOffset: 0 },
+    { label: '=', value: ' = ' },
+    { label: '+', value: ' + ' },
+    { label: '-', value: ' - ' },
+    { label: '×', value: ' * ' },
+    { label: '÷', value: ' / ' }
+  ],
+  [
+    { label: 'x', value: 'x' },
+    { label: 'y', value: 'y' },
+    { label: '^', value: '^' },
+    { label: '(', value: '(' },
+    { label: ')', value: ')' },
+    { label: ',', value: ',' }
+  ],
+  [
+    { label: 'sin', value: 'sin()', cursorOffset: 1 },
+    { label: 'cos', value: 'cos()', cursorOffset: 1 },
+    { label: 'tan', value: 'tan()', cursorOffset: 1 },
+    { label: 'exp', value: 'exp()', cursorOffset: 1 },
+    { label: 'ln', value: 'ln()', cursorOffset: 1 },
+    { label: '√', value: 'sqrt()', cursorOffset: 1 }
+  ],
+  [
+    { label: 'π', value: 'pi' },
+    { label: 'e', value: 'e' },
+    { label: '|y|', value: 'abs(y)' },
+    { label: 'y′', value: "dy/dx = " },
+    { label: '←', value: 'BACKSPACE' }
+  ]
+];
+
+function setupVirtualKeyboard(container, target) {
+  if (!container || !target) return;
+  container.innerHTML = '';
+  KEY_LAYOUT.forEach((row) => {
+    row.forEach((key) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'virtual-key';
+      button.textContent = key.label;
+      button.addEventListener('click', () => {
+        handleKeyPress(target, key);
+      });
+      container.appendChild(button);
+    });
+  });
+}
+
+function handleKeyPress(target, key) {
+  if (key.value === 'BACKSPACE') {
+    const start = target.selectionStart;
+    const end = target.selectionEnd;
+    if (start === end && start > 0) {
+      const before = target.value.slice(0, start - 1);
+      const after = target.value.slice(end);
+      target.value = before + after;
+      setSelection(target, start - 1);
+    } else {
+      const before = target.value.slice(0, start);
+      const after = target.value.slice(end);
+      target.value = before + after;
+      setSelection(target, start);
+    }
+    dispatchInput(target);
+    return;
+  }
+  insertText(target, key.value, key.cursorOffset || 0);
+}
+
+function insertText(target, text, cursorOffset) {
+  const start = target.selectionStart;
+  const end = target.selectionEnd;
+  const before = target.value.slice(0, start);
+  const after = target.value.slice(end);
+  target.value = `${before}${text}${after}`;
+  const newPosition = start + text.length - (cursorOffset || 0);
+  setSelection(target, newPosition);
+  dispatchInput(target);
+}
+
+function setSelection(target, position) {
+  target.focus();
+  target.selectionStart = position;
+  target.selectionEnd = position;
+}
+
+function dispatchInput(target) {
+  const event = new Event('input', { bubbles: true });
+  target.dispatchEvent(event);
+}
+
+
+const FUNCTIONS = new Set(['sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'exp', 'ln', 'log', 'sqrt', 'abs']);
+const CONSTANTS = new Map([
+  ['pi', Math.PI],
+  ['e', Math.E]
+]);
+
+const OP_INFO = {
+  '+': { precedence: 1, associativity: 'left', args: 2 },
+  '-': { precedence: 1, associativity: 'left', args: 2 },
+  '*': { precedence: 2, associativity: 'left', args: 2 },
+  '/': { precedence: 2, associativity: 'left', args: 2 },
+  '^': { precedence: 3, associativity: 'right', args: 2 },
+  'u-': { precedence: 4, associativity: 'right', args: 1 }
+};
+
+const PREC_MAP = {
+  number: 5,
+  variable: 5,
+  function: 5,
+  unary: 4,
+  '^': 3,
+  '*': 2,
+  '/': 2,
+  '+': 1,
+  '-': 1
+};
+
+function tokenize(input) {
+  const tokens = [];
+  let i = 0;
+  let prevType = 'start';
+  while (i < input.length) {
+    const char = input[i];
+    if (char === ' ' || char === '\t' || char === '\n') {
+      i += 1;
+      continue;
+    }
+    if (/[0-9.]/.test(char)) {
+      let numStr = char;
+      i += 1;
+      while (i < input.length && /[0-9.]/.test(input[i])) {
+        numStr += input[i];
+        i += 1;
+      }
+      if (numStr.split('.').length > 2) {
+        throw new Error('عدد نامعتبر است.');
+      }
+      tokens.push({ type: 'number', value: parseFloat(numStr) });
+      prevType = 'number';
+      continue;
+    }
+    if (/[a-zA-Z_]/.test(char)) {
+      let id = char;
+      i += 1;
+      while (i < input.length && /[a-zA-Z0-9_]/.test(input[i])) {
+        id += input[i];
+        i += 1;
+      }
+      const lower = id.toLowerCase();
+      if (CONSTANTS.has(lower)) {
+        tokens.push({ type: 'number', value: CONSTANTS.get(lower) });
+        prevType = 'number';
+        continue;
+      }
+      if (FUNCTIONS.has(lower)) {
+        tokens.push({ type: 'function', value: lower });
+        prevType = 'function';
+        continue;
+      }
+      if (lower === 'x' || lower === 'y') {
+        tokens.push({ type: 'variable', value: lower });
+        prevType = 'variable';
+        continue;
+      }
+      throw new Error(`نماد ناشناخته: ${id}`);
+    }
+    if (char === ',') {
+      tokens.push({ type: 'comma' });
+      i += 1;
+      prevType = 'comma';
+      continue;
+    }
+    if (char === '(') {
+      tokens.push({ type: 'lparen' });
+      i += 1;
+      prevType = 'lparen';
+      continue;
+    }
+    if (char === ')') {
+      tokens.push({ type: 'rparen' });
+      i += 1;
+      prevType = 'rparen';
+      continue;
+    }
+    if (OP_INFO[char]) {
+      let op = char;
+      if (char === '-' && (prevType === 'start' || prevType === 'operator' || prevType === 'lparen' || prevType === 'comma')) {
+        op = 'u-';
+      }
+      tokens.push({ type: 'operator', value: op });
+      i += 1;
+      prevType = 'operator';
+      continue;
+    }
+    throw new Error(`کاراکتر نامعتبر: ${char}`);
+  }
+  return tokens;
+}
+
+function toRPN(tokens) {
+  const output = [];
+  const stack = [];
+  for (const token of tokens) {
+    switch (token.type) {
+      case 'number':
+      case 'variable':
+        output.push(token);
+        break;
+      case 'function':
+        stack.push(token);
+        break;
+      case 'comma':
+        while (stack.length && stack[stack.length - 1].type !== 'lparen') {
+          output.push(stack.pop());
+        }
+        if (!stack.length) throw new Error('پرانتز جفت نشده است.');
+        break;
+      case 'operator': {
+        const o1 = token.value;
+        while (stack.length) {
+          const top = stack[stack.length - 1];
+          if (top.type === 'function') {
+            output.push(stack.pop());
+            continue;
+          }
+          if (top.type === 'operator') {
+            const o2 = top.value;
+            const info1 = OP_INFO[o1];
+            const info2 = OP_INFO[o2];
+            if ((info1.associativity === 'left' && info1.precedence <= info2.precedence) ||
+                (info1.associativity === 'right' && info1.precedence < info2.precedence)) {
+              output.push(stack.pop());
+              continue;
+            }
+          }
+          break;
+        }
+        stack.push(token);
+        break;
+      }
+      case 'lparen':
+        stack.push(token);
+        break;
+      case 'rparen': {
+        let found = false;
+        while (stack.length) {
+          const top = stack.pop();
+          if (top.type === 'lparen') {
+            found = true;
+            break;
+          }
+          output.push(top);
+        }
+        if (!found) throw new Error('پرانتز جفت نشده است.');
+        if (stack.length && stack[stack.length - 1].type === 'function') {
+          output.push(stack.pop());
+        }
+        break;
+      }
+      default:
+        throw new Error('توکن ناشناخته در RPN');
+    }
+  }
+  while (stack.length) {
+    const top = stack.pop();
+    if (top.type === 'lparen' || top.type === 'rparen') {
+      throw new Error('پرانتز جفت نشده است.');
+    }
+    output.push(top);
+  }
+  return output;
+}
+
+function buildAST(rpn) {
+  const stack = [];
+  for (const token of rpn) {
+    if (token.type === 'number') {
+      stack.push(createNumber(token.value));
+      continue;
+    }
+    if (token.type === 'variable') {
+      stack.push(createVariable(token.value));
+      continue;
+    }
+    if (token.type === 'operator') {
+      const info = OP_INFO[token.value];
+      if (info.args === 1) {
+        if (stack.length < 1) throw new Error('عملگر یکتا آرگومان کافی ندارد.');
+        const arg = stack.pop();
+        stack.push(createUnary(token.value, arg));
+      } else {
+        if (stack.length < 2) throw new Error('عملگر دودویی آرگومان کافی ندارد.');
+        const right = stack.pop();
+        const left = stack.pop();
+        stack.push(createBinary(token.value, left, right));
+      }
+      continue;
+    }
+    if (token.type === 'function') {
+      if (!stack.length) throw new Error('تابع بدون آرگومان است.');
+      const arg = stack.pop();
+      stack.push(createFunction(token.value, arg));
+      continue;
+    }
+    throw new Error('توکن ناشناخته در ساخت AST');
+  }
+  if (stack.length !== 1) throw new Error('ساختار معادله نامعتبر است.');
+  return simplifyNode(stack[0]);
+}
+
+function parseExpression(input) {
+  if (!input || !input.trim()) {
+    throw new Error('عبارت خالی است.');
+  }
+  const sanitized = input.replace(/−/g, '-');
+  const tokens = tokenize(sanitized);
+  const rpn = toRPN(tokens);
+  return buildAST(rpn);
+}
+
+function createNumber(value) {
+  return { type: 'number', value };
+}
+
+function createVariable(name) {
+  return { type: 'variable', name };
+}
+
+function createUnary(op, argument) {
+  return { type: 'unary', op, argument };
+}
+
+function createFunction(name, argument) {
+  return { type: 'function', name, argument };
+}
+
+function createBinary(op, left, right) {
+  return { type: 'binary', op, left, right };
+}
+
+function cloneNode(node) {
+  switch (node.type) {
+    case 'number':
+      return createNumber(node.value);
+    case 'variable':
+      return createVariable(node.name);
+    case 'unary':
+      return { type: 'unary', op: node.op, argument: cloneNode(node.argument) };
+    case 'function':
+      return createFunction(node.name, cloneNode(node.argument));
+    case 'binary':
+      return createBinary(node.op, cloneNode(node.left), cloneNode(node.right));
+    default:
+      throw new Error('گره ناشناخته برای کلون کردن');
+  }
+}
+
+function simplifyNode(node) {
+  switch (node.type) {
+    case 'number':
+    case 'variable':
+      return node;
+    case 'unary': {
+      const arg = simplifyNode(node.argument);
+      if (node.op === 'u-') {
+        if (arg.type === 'number') {
+          return createNumber(-arg.value);
+        }
+        return createUnary('u-', arg);
+      }
+      return { type: 'unary', op: node.op, argument: arg };
+    }
+    case 'function':
+      return createFunction(node.name, simplifyNode(node.argument));
+    case 'binary': {
+      const left = simplifyNode(node.left);
+      const right = simplifyNode(node.right);
+      if (left.type === 'number' && right.type === 'number') {
+        return createNumber(evalBinary(node.op, left.value, right.value));
+      }
+      if (node.op === '+') {
+        if (isZeroNode(left)) return right;
+        if (isZeroNode(right)) return left;
+      }
+      if (node.op === '-') {
+        if (isZeroNode(right)) return left;
+      }
+      if (node.op === '*') {
+        if (isZeroNode(left) || isZeroNode(right)) return createNumber(0);
+        if (isOneNode(left)) return right;
+        if (isOneNode(right)) return left;
+      }
+      if (node.op === '/') {
+        if (isZeroNode(left)) return createNumber(0);
+        if (isOneNode(right)) return left;
+      }
+      if (node.op === '^') {
+        if (isZeroNode(right)) return createNumber(1);
+        if (isOneNode(right)) return left;
+        if (left.type === 'number' && right.type === 'number') {
+          return createNumber(Math.pow(left.value, right.value));
+        }
+      }
+      return createBinary(node.op, left, right);
+    }
+    default:
+      throw new Error('نوع گره ناشناخته در ساده‌سازی');
+  }
+}
+
+function evalBinary(op, left, right) {
+  switch (op) {
+    case '+':
+      return left + right;
+    case '-':
+      return left - right;
+    case '*':
+      return left * right;
+    case '/':
+      return left / right;
+    case '^':
+      return Math.pow(left, right);
+    default:
+      throw new Error('عملگر ناشناخته در محاسبه');
+  }
+}
+
+function isZeroNode(node) {
+  return node.type === 'number' && Math.abs(node.value) < 1e-9;
+}
+
+function isOneNode(node) {
+  return node.type === 'number' && Math.abs(node.value - 1) < 1e-9;
+}
+
+function getPrecedence(node) {
+  if (node.type === 'binary') {
+    return PREC_MAP[node.op] || 1;
+  }
+  if (node.type === 'unary') return PREC_MAP.unary;
+  return PREC_MAP[node.type] || 4;
+}
+
+function nodeToString(node, parentOp = null, position = 'middle') {
+  switch (node.type) {
+    case 'number':
+      return formatNumber(node.value);
+    case 'variable':
+      return node.name;
+    case 'unary': {
+      const inner = nodeToString(node.argument, null, 'middle');
+      if (node.op === 'u-') {
+        return `-${needsParens(node.argument) ? '(' + inner + ')' : inner}`;
+      }
+      return `${node.op}${inner}`;
+    }
+    case 'function':
+      return `${node.name}(${nodeToString(node.argument)})`;
+    case 'binary': {
+      const currentPrec = getPrecedence(node);
+      const leftStr = nodeToString(node.left, node.op, 'left');
+      const rightStr = nodeToString(node.right, node.op, 'right');
+      const leftNeeds = shouldWrap(node.left, currentPrec, 'left', node.op);
+      const rightNeeds = shouldWrap(node.right, currentPrec, 'right', node.op);
+      const left = leftNeeds ? `(${leftStr})` : leftStr;
+      const right = rightNeeds ? `(${rightStr})` : rightStr;
+      return `${left} ${node.op} ${right}`;
+    }
+    default:
+      throw new Error('نوع گره ناشناخته در تبدیل به متن');
+  }
+}
+
+function needsParens(node) {
+  return node.type === 'binary';
+}
+
+function shouldWrap(node, parentPrec, position, parentOp) {
+  if (node.type !== 'binary') return false;
+  const childPrec = getPrecedence(node);
+  if (childPrec < parentPrec) return true;
+  if (childPrec === parentPrec) {
+    if (parentOp === '^') {
+      return position === 'right';
+    }
+    if ((parentOp === '-' || parentOp === '/')) {
+      return position === 'right';
+    }
+  }
+  return false;
+}
+
+function formatNumber(value) {
+  if (Number.isInteger(value)) return value.toString();
+  return parseFloat(value.toFixed(6)).toString();
+}
+
+function dependsOn(node, variable) {
+  switch (node.type) {
+    case 'number':
+      return false;
+    case 'variable':
+      return node.name === variable;
+    case 'unary':
+      return dependsOn(node.argument, variable);
+    case 'function':
+      return dependsOn(node.argument, variable);
+    case 'binary':
+      return dependsOn(node.left, variable) || dependsOn(node.right, variable);
+    default:
+      return false;
+  }
+}
+
+function isConstantWithRespectTo(node, variable) {
+  return !dependsOn(node, variable);
+}
+
+function evaluateNode(node, scope = {}) {
+  switch (node.type) {
+    case 'number':
+      return node.value;
+    case 'variable': {
+      if (scope[node.name] === undefined) {
+        throw new Error(`مقدار ${node.name} تعریف نشده است.`);
+      }
+      return scope[node.name];
+    }
+    case 'unary': {
+      const value = evaluateNode(node.argument, scope);
+      if (node.op === 'u-') return -value;
+      throw new Error('عملگر یکتا پشتیبانی نمی‌شود.');
+    }
+    case 'function': {
+      const arg = evaluateNode(node.argument, scope);
+      switch (node.name) {
+        case 'sin':
+          return Math.sin(arg);
+        case 'cos':
+          return Math.cos(arg);
+        case 'tan':
+          return Math.tan(arg);
+        case 'cot':
+          return 1 / Math.tan(arg);
+        case 'sec':
+          return 1 / Math.cos(arg);
+        case 'csc':
+          return 1 / Math.sin(arg);
+        case 'exp':
+          return Math.exp(arg);
+        case 'ln':
+        case 'log':
+          return Math.log(arg);
+        case 'sqrt':
+          return Math.sqrt(arg);
+        case 'abs':
+          return Math.abs(arg);
+        default:
+          throw new Error(`تابع ${node.name} پشتیبانی نمی‌شود.`);
+      }
+    }
+    case 'binary': {
+      const left = evaluateNode(node.left, scope);
+      const right = evaluateNode(node.right, scope);
+      switch (node.op) {
+        case '+':
+          return left + right;
+        case '-':
+          return left - right;
+        case '*':
+          return left * right;
+        case '/':
+          return left / right;
+        case '^':
+          return Math.pow(left, right);
+        default:
+          throw new Error('عملگر ناشناخته در ارزیابی');
+      }
+    }
+    default:
+      throw new Error('نوع گره ناشناخته در ارزیابی');
+  }
+}
+
+function makeAdd(a, b) {
+  return simplifyNode(createBinary('+', a, b));
+}
+
+function makeSub(a, b) {
+  return simplifyNode(createBinary('-', a, b));
+}
+
+function makeMul(a, b) {
+  return simplifyNode(createBinary('*', a, b));
+}
+
+function makeDiv(a, b) {
+  return simplifyNode(createBinary('/', a, b));
+}
+
+function makePow(a, b) {
+  return simplifyNode(createBinary('^', a, b));
+}
+
+function makeNeg(a) {
+  return simplifyNode(createUnary('u-', a));
+}
+
+function flattenProduct(node) {
+  const result = [];
+  function helper(current, denominator = false) {
+    if (current.type === 'binary' && current.op === '*') {
+      helper(current.left, denominator);
+      helper(current.right, denominator);
+      return;
+    }
+    if (current.type === 'binary' && current.op === '/') {
+      helper(current.left, denominator);
+      helper(current.right, !denominator);
+      return;
+    }
+    result.push({ node: current, denominator });
+  }
+  helper(node, false);
+  return result;
+}
+
+function flattenSum(node) {
+  const result = [];
+  function helper(current, sign = 1) {
+    if (current.type === 'binary' && current.op === '+') {
+      helper(current.left, sign);
+      helper(current.right, sign);
+      return;
+    }
+    if (current.type === 'binary' && current.op === '-') {
+      helper(current.left, sign);
+      helper(current.right, -sign);
+      return;
+    }
+    if (sign === -1) {
+      result.push(makeMul(createNumber(-1), current));
+    } else {
+      result.push(current);
+    }
+  }
+  helper(node, 1);
+  return result;
+}
+
+function approxEquals(a, b, tolerance = 1e-6) {
+  return Math.abs(a - b) < tolerance;
+}
+
+function isNumberNode(node) {
+  return node.type === 'number';
+}
+
+function isVariableNode(node, variable) {
+  return node.type === 'variable' && node.name === variable;
+}
+
+function ensureNode(node) {
+  if (!node) throw new Error('گره نامعتبر است.');
+  return node;
+}
+
+function integrate(node, variable) {
+  const result = integrateInternal(node, variable);
+  if (!result) {
+    return null;
+  }
+  return simplifyNode(result);
+}
+
+function integrateInternal(node, variable) {
+  if (!dependsOn(node, variable)) {
+    return makeMul(node, createVariable(variable));
+  }
+
+  if (node.type === 'number') {
+    return makeMul(node, createVariable(variable));
+  }
+
+  if (node.type === 'variable') {
+    if (node.name === variable) {
+      return makeMul(createNumber(0.5), makePow(createVariable(variable), createNumber(2)));
+    }
+    return makeMul(node, createVariable(variable));
+  }
+
+  if (node.type === 'unary' && node.op === 'u-') {
+    const integrated = integrateInternal(node.argument, variable);
+    if (!integrated) return null;
+    return makeNeg(integrated);
+  }
+
+  if (node.type === 'binary') {
+    const { op, left, right } = node;
+    if (op === '+') {
+      const leftInt = integrateInternal(left, variable);
+      const rightInt = integrateInternal(right, variable);
+      if (!leftInt || !rightInt) return null;
+      return makeAdd(leftInt, rightInt);
+    }
+    if (op === '-') {
+      const leftInt = integrateInternal(left, variable);
+      const rightInt = integrateInternal(right, variable);
+      if (!leftInt || !rightInt) return null;
+      return makeSub(leftInt, rightInt);
+    }
+    if (op === '*') {
+      if (isConstantWithRespectTo(left, variable)) {
+        const rightInt = integrateInternal(right, variable);
+        if (!rightInt) return null;
+        return makeMul(left, rightInt);
+      }
+      if (isConstantWithRespectTo(right, variable)) {
+        const leftInt = integrateInternal(left, variable);
+        if (!leftInt) return null;
+        return makeMul(right, leftInt);
+      }
+      return null;
+    }
+    if (op === '/') {
+      if (!dependsOn(right, variable) && dependsOn(left, variable)) {
+        const denominator = right;
+        const integral = integrateInternal(left, variable);
+        if (!integral) return null;
+        return makeDiv(integral, denominator);
+      }
+      if (!dependsOn(left, variable) && dependsOn(right, variable)) {
+        const numeratorValue = extractNumericConstant(left);
+        if (numeratorValue === null) return null;
+        const linearInfo = matchLinear(right, variable);
+        if (linearInfo && linearInfo.a !== 0) {
+          const factor = numeratorValue / linearInfo.a;
+          const inside = linearInfo.node;
+          return makeMul(createNumber(factor), createFunction('ln', createFunction('abs', inside)));
+        }
+        if (isVariableNode(right, variable) && Math.abs(numeratorValue) > 0) {
+          const factor = numeratorValue;
+          return makeMul(createNumber(factor), createFunction('ln', createFunction('abs', createVariable(variable))));
+        }
+      }
+      return null;
+    }
+    if (op === '^') {
+      if (isVariableNode(left, variable) && right.type === 'number') {
+        const power = right.value;
+        if (Math.abs(power + 1) < 1e-9) {
+          return createFunction('ln', createFunction('abs', createVariable(variable)));
+        }
+        const newExp = power + 1;
+        const coefficient = 1 / newExp;
+        return makeMul(createNumber(coefficient), makePow(createVariable(variable), createNumber(newExp)));
+      }
+      return null;
+    }
+    return null;
+  }
+
+  if (node.type === 'function') {
+    const arg = node.argument;
+    const linearInfo = matchLinear(arg, variable);
+    switch (node.name) {
+      case 'exp':
+        if (linearInfo && linearInfo.a !== 0) {
+          const factor = 1 / linearInfo.a;
+          return makeMul(createNumber(factor), createFunction('exp', cloneNode(arg)));
+        }
+        break;
+      case 'sin':
+        if (linearInfo && linearInfo.a !== 0) {
+          const factor = -1 / linearInfo.a;
+          return makeMul(createNumber(factor), createFunction('cos', cloneNode(arg)));
+        }
+        break;
+      case 'cos':
+        if (linearInfo && linearInfo.a !== 0) {
+          const factor = 1 / linearInfo.a;
+          return makeMul(createNumber(factor), createFunction('sin', cloneNode(arg)));
+        }
+        break;
+      case 'tan':
+        if (linearInfo && linearInfo.a !== 0) {
+          const factor = -1 / linearInfo.a;
+          return makeMul(createNumber(factor), createFunction('ln', createFunction('abs', createFunction('cos', cloneNode(arg)))));
+        }
+        break;
+      case 'ln':
+      case 'log':
+        if (matchLinear(arg, variable) && !dependsOn(arg, variable)) {
+          return makeMul(node, createVariable(variable));
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return null;
+}
+
+function extractNumericConstant(node) {
+  if (!dependsOn(node, 'x') && !dependsOn(node, 'y')) {
+    if (node.type === 'number') return node.value;
+  }
+  return null;
+}
+
+function matchLinear(node, variable) {
+  const result = matchLinearRecursive(node, variable);
+  if (!result) return null;
+  if (Math.abs(result.a) < 1e-9) {
+    return { a: 0, b: result.b, node: simplifyNode(result.b) };
+  }
+  const linearNode = simplifyNode(makeAdd(makeMul(createNumber(result.a), createVariable(variable)), result.b));
+  return { a: result.a, b: result.b, node: linearNode };
+}
+
+function matchLinearRecursive(node, variable) {
+  if (!dependsOn(node, variable)) {
+    return { a: 0, b: node };
+  }
+  if (isVariableNode(node, variable)) {
+    return { a: 1, b: createNumber(0) };
+  }
+  if (node.type === 'unary' && node.op === 'u-') {
+    const inner = matchLinearRecursive(node.argument, variable);
+    if (!inner) return null;
+    return { a: -inner.a, b: makeNeg(inner.b) };
+  }
+  if (node.type === 'binary') {
+    const { op, left, right } = node;
+    if (op === '+') {
+      const leftLinear = matchLinearRecursive(left, variable);
+      const rightLinear = matchLinearRecursive(right, variable);
+      if (!leftLinear || !rightLinear) return null;
+      return {
+        a: leftLinear.a + rightLinear.a,
+        b: makeAdd(leftLinear.b, rightLinear.b)
+      };
+    }
+    if (op === '-') {
+      const leftLinear = matchLinearRecursive(left, variable);
+      const rightLinear = matchLinearRecursive(right, variable);
+      if (!leftLinear || !rightLinear) return null;
+      return {
+        a: leftLinear.a - rightLinear.a,
+        b: makeSub(leftLinear.b, rightLinear.b)
+      };
+    }
+    if (op === '*') {
+      if (isConstantWithRespectTo(left, variable)) {
+        const leftConst = extractNumericConstant(left);
+        if (leftConst === null) return null;
+        const rightLinear = matchLinearRecursive(right, variable);
+        if (!rightLinear) return null;
+        return {
+          a: rightLinear.a * leftConst,
+          b: makeMul(createNumber(leftConst), rightLinear.b)
+        };
+      }
+      if (isConstantWithRespectTo(right, variable)) {
+        const rightConst = extractNumericConstant(right);
+        if (rightConst === null) return null;
+        const leftLinear = matchLinearRecursive(left, variable);
+        if (!leftLinear) return null;
+        return {
+          a: leftLinear.a * rightConst,
+          b: makeMul(createNumber(rightConst), leftLinear.b)
+        };
+      }
+      return null;
+    }
+    if (op === '/') {
+      if (isConstantWithRespectTo(right, variable)) {
+        const constValue = extractNumericConstant(right);
+        if (constValue === null || Math.abs(constValue) < 1e-9) return null;
+        const leftLinear = matchLinearRecursive(left, variable);
+        if (!leftLinear) return null;
+        return {
+          a: leftLinear.a / constValue,
+          b: makeDiv(leftLinear.b, createNumber(constValue))
+        };
+      }
+      return null;
+    }
+  }
+  return null;
+}
+
+// no-op placeholders removed
+
+
+const DEFAULT_SPAN = 4;
+
+function renderSolutionChart(canvas, derivativeFn, options = {}) {
+  if (!canvas || typeof derivativeFn !== 'function') {
+    if (canvas) clearChart(canvas);
+    return { success: false, notice: 'ورودی نامعتبر برای نمودار.' };
+  }
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  const span = options.span || DEFAULT_SPAN;
+  const x0 = options.x0 ?? 0;
+  const y0 = options.y0 ?? 1;
+  const forwardPoints = integrateDirection(derivativeFn, x0, y0, span, 160, 1);
+  const backwardPoints = integrateDirection(derivativeFn, x0, y0, span, 160, -1);
+  backwardPoints.reverse();
+  const points = [...backwardPoints, { x: x0, y: y0 }, ...forwardPoints];
+  const filtered = points.filter((pt) => Number.isFinite(pt.x) && Number.isFinite(pt.y));
+  if (filtered.length < 2) {
+    return { success: false, notice: 'اطلاعات کافی برای رسم نمودار در دسترس نبود.' };
+  }
+  const xValues = filtered.map((p) => p.x);
+  const yValues = filtered.map((p) => p.y);
+  let xMin = Math.min(...xValues);
+  let xMax = Math.max(...xValues);
+  let yMin = Math.min(...yValues);
+  let yMax = Math.max(...yValues);
+  if (xMax === xMin) {
+    xMin -= 1;
+    xMax += 1;
+  }
+  if (yMax === yMin) {
+    yMin -= 1;
+    yMax += 1;
+  }
+  const padding = 45;
+  const xScale = (width - 2 * padding) / (xMax - xMin);
+  const yScale = (height - 2 * padding) / (yMax - yMin);
+  ctx.save();
+  ctx.translate(0.5, 0.5);
+  drawBackground(ctx, width, height);
+  const config = { padding, width, height, xScale, yScale, xMin, yMin, x0, y0 };
+  drawAxes(ctx, { xMin, xMax, yMin, yMax }, config);
+  drawCurve(ctx, filtered, config);
+  ctx.restore();
+  const notice = `نمودار با شرط اولیه (${formatNumber(x0)}, ${formatNumber(y0)}) رسم شد.`;
+  return { success: true, notice };
+}
+
+function clearChart(canvas) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function integrateDirection(f, x0, y0, span, steps, direction) {
+  const h = (span / steps) * direction;
+  let x = x0;
+  let y = y0;
+  const pts = [];
+  for (let i = 0; i < steps; i += 1) {
+    const next = rungeKuttaStep(f, x, y, h);
+    if (!Number.isFinite(next.y)) break;
+    x = next.x;
+    y = next.y;
+    pts.push({ x, y });
+  }
+  return pts;
+}
+
+function rungeKuttaStep(f, x, y, h) {
+  const k1 = safeEval(f, x, y);
+  const k2 = safeEval(f, x + h / 2, y + (h * k1) / 2);
+  const k3 = safeEval(f, x + h / 2, y + (h * k2) / 2);
+  const k4 = safeEval(f, x + h, y + h * k3);
+  const nextY = y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+  const nextX = x + h;
+  if (!Number.isFinite(nextY)) {
+    return { x: nextX, y: Number.NaN };
+  }
+  return { x: nextX, y: nextY };
+}
+
+function safeEval(f, x, y) {
+  const value = f(x, y);
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return value;
+}
+
+function drawBackground(ctx, width, height) {
+  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface') || '#fff';
+  ctx.fillRect(0, 0, width, height);
+}
+
+function drawAxes(ctx, range, config) {
+  const { padding, width, height, xScale, yScale, xMin, yMin } = {
+    padding: config.padding,
+    width: config.width,
+    height: config.height,
+    xScale: config.xScale,
+    yScale: config.yScale,
+    xMin: range.xMin,
+    yMin: range.yMin
+  };
+  const accent = getComputedStyle(document.body).getPropertyValue('--accent') || '#4c6ef5';
+  const gridColor = getComputedStyle(document.body).getPropertyValue('--border') || 'rgba(0,0,0,0.2)';
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = Math.ceil(range.xMin); i <= Math.floor(range.xMax); i += 1) {
+    const x = padding + (i - range.xMin) * xScale;
+    ctx.moveTo(x, padding);
+    ctx.lineTo(x, height - padding);
+  }
+  for (let j = Math.ceil(range.yMin); j <= Math.floor(range.yMax); j += 1) {
+    const y = height - padding - (j - range.yMin) * yScale;
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  if (range.yMin < 0 && range.yMax > 0) {
+    const zeroY = height - padding - (0 - range.yMin) * yScale;
+    ctx.moveTo(padding, zeroY);
+    ctx.lineTo(width - padding, zeroY);
+  }
+  if (range.xMin < 0 && range.xMax > 0) {
+    const zeroX = padding + (0 - range.xMin) * xScale;
+    ctx.moveTo(zeroX, padding);
+    ctx.lineTo(zeroX, height - padding);
+  }
+  ctx.stroke();
+}
+
+function drawCurve(ctx, points, config) {
+  const accent = getComputedStyle(document.body).getPropertyValue('--accent') || '#4c6ef5';
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  points.forEach((pt, index) => {
+    const canvasPoint = toCanvas(pt, config);
+    if (index === 0) {
+      ctx.moveTo(canvasPoint.x, canvasPoint.y);
+    } else {
+      ctx.lineTo(canvasPoint.x, canvasPoint.y);
+    }
+  });
+  ctx.stroke();
+  ctx.fillStyle = accent;
+  const origin = toCanvas({ x: config.x0, y: config.y0 }, config);
+  ctx.beginPath();
+  ctx.arc(origin.x, origin.y, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function toCanvas(point, config) {
+  const { padding, xMin, yMin, xScale, yScale } = config;
+  const x = padding + (point.x - xMin) * xScale;
+  const y = config.height - padding - (point.y - yMin) * yScale;
+  return { x, y };
+}
+
+function formatNumber(value) {
+  if (Math.abs(value) >= 1000 || Math.abs(value) < 0.001) {
+    return value.toExponential(2);
+  }
+  return Number(value.toFixed(2));
+}
+
+function processEquation(rawInput) {
+  try {
+    const parsed = parseDifferentialEquation(rawInput);
+    const classification = classifyEquation(parsed.rhs);
+    if (classification.type === 'direct') {
+      return buildDirectSolution(parsed, classification);
+    }
+    if (classification.type === 'separable') {
+      return buildSeparableSolution(parsed, classification);
+    }
+    if (classification.type === 'linear') {
+      return buildLinearSolution(parsed, classification);
+    }
+    return {
+      status: 'unsupported',
+      message: 'در حال حاضر این معادله پشتیبانی نمی‌شود. سعی کن فرم را ساده‌تر وارد کنی یا فقط معادلات جداشدنی و خطی مرتبه اول را امتحان کن.'
+    };
+  } catch (error) {
+    return {
+      status: 'error',
+      message: error.message || 'خطای ناشناخته هنگام پردازش معادله رخ داده است.'
+    };
+  }
+}
+
+function createDerivativeEvaluator(rhsNode) {
+  return (x, y) => {
+    try {
+      const value = evaluateNode(rhsNode, { x, y });
+      if (!Number.isFinite(value)) {
+        return NaN;
+      }
+      return value;
+    } catch (error) {
+      return NaN;
+    }
+  };
+}
+
+function parseDifferentialEquation(rawInput) {
+  const cleaned = rawInput.replace(/\s+/g, ' ').replace(/،/g, ',').trim();
+  if (!cleaned.includes('=')) {
+    throw new Error('معادله باید شامل علامت = باشد.');
+  }
+  const [lhsRaw, rhsRaw] = cleaned.split('=').map((part) => part.trim());
+  const lhsNormalized = lhsRaw.replace(/\s+/g, '').toLowerCase();
+  if (lhsNormalized !== 'dy/dx') {
+    throw new Error('سمت چپ معادله باید به صورت dy/dx باشد.');
+  }
+  const rhsAst = parseExpression(rhsRaw);
+  return {
+    rhs: rhsAst,
+    normalizedEquation: `dy/dx = ${nodeToString(rhsAst)}`
+  };
+}
+
+function classifyEquation(rhs) {
+  if (!dependsOn(rhs, 'y')) {
+    return { type: 'direct', rhs };
+  }
+  const separable = detectSeparable(rhs);
+  if (separable) {
+    return { type: 'separable', rhs, ...separable };
+  }
+  const linear = detectLinear(rhs);
+  if (linear) {
+    return { type: 'linear', rhs, ...linear };
+  }
+  return { type: 'unsupported', rhs };
+}
+
+function buildDirectSolution(parsed, classification) {
+  const integral = integrate(classification.rhs, 'x');
+  if (!integral) {
+    throw new Error('انتگرال سمت راست به سادگی قابل محاسبه نیست.');
+  }
+  const rhsText = nodeToString(classification.rhs);
+  const integralText = nodeToString(integral);
+  const steps = [
+    {
+      title: 'گام ۱: تشخیص ساختار',
+      description: 'سمت راست معادله فقط تابعی از x است، پس می‌توانیم با انتگرال‌گیری مستقیم طرفین معادله را حل کنیم.'
+    },
+    {
+      title: 'گام ۲: انتگرال‌گیری طرفین',
+      description: 'انتگرال طرف چپ برابر y و انتگرال طرف راست برابر انتگرال تابع x است.',
+      equationLine: `∫ dy = ∫ (${rhsText}) dx`
+    },
+    {
+      title: 'گام ۳: به دست آوردن پاسخ نهایی',
+      description: 'با انجام انتگرال‌گیری، جواب کلی معادله به دست می‌آید.',
+      equationLine: `y(x) = ${integralText} + C`
+    }
+  ];
+  return {
+    status: 'ok',
+    classification: 'direct',
+    normalizedEquation: parsed.normalizedEquation,
+    hint: 'این معادله فقط به x وابسته است، پس با یک انتگرال‌گیری ساده حل می‌شود.',
+    steps,
+    finalSolution: `y(x) = ${integralText} + C`,
+    rhsNode: classification.rhs
+  };
+}
+
+function buildSeparableSolution(parsed, classification) {
+  const { xPart, yPart } = classification;
+  const xText = nodeToString(xPart);
+  const yText = nodeToString(yPart);
+  const leftIntegrand = simplifyNode(makeDiv(createNumber(1), yPart));
+  const rightIntegrand = simplifyNode(xPart);
+  const leftIntegral = integrate(leftIntegrand, 'y');
+  const rightIntegral = integrate(rightIntegrand, 'x');
+  if (!leftIntegral || !rightIntegral) {
+    throw new Error('انتگرال‌های لازم برای حل جداشدنی در دسترس نبودند.');
+  }
+  const leftText = nodeToString(leftIntegral);
+  const rightText = nodeToString(rightIntegral);
+  const implicitSolution = `${leftText} = ${rightText} + C`;
+  const explicit = deriveExplicitFromSeparable(leftIntegral, rightIntegral);
+  const steps = [
+    {
+      title: 'گام ۱: تشخیص معادله جداشدنی',
+      description: 'معادله را به صورت حاصل‌ضرب تابعی از x و تابعی از y نوشتیم، پس جداشدنی است.'
+    },
+    {
+      title: 'گام ۲: جدا کردن متغیرها',
+      description: 'طرفین معادله را تقسیم می‌کنیم تا هر سمت فقط شامل یک متغیر باشد.',
+      equationLine: `1/(${yText}) dy = (${xText}) dx`
+    },
+    {
+      title: 'گام ۳: انتگرال‌گیری طرفین',
+      description: 'روی هر دو سمت انتگرال می‌گیریم تا به رابطه بین x و y برسیم.',
+      equationLine: `∫ 1/(${yText}) dy = ∫ (${xText}) dx`
+    },
+    {
+      title: 'گام ۴: پاسخ کلی',
+      description: 'نتیجه نهایی را می‌توان به صورت ضمنی نوشت و در صورت امکان به فرم صریح ساده کرد.',
+      equationLine: implicitSolution
+    }
+  ];
+  if (explicit) {
+    steps.push({
+      title: 'گام ۵: بیان پاسخ صریح',
+      description: 'با ساده‌سازی عبارت لگاریتمی، پاسخ را به فرم صریح نوشتیم.',
+      equationLine: explicit
+    });
+  }
+  return {
+    status: 'ok',
+    classification: 'separable',
+    normalizedEquation: parsed.normalizedEquation,
+    hint: 'این معادله جداشدنی است. سعی کن yها را به یک سمت و xها را به سمت دیگر ببری.',
+    steps,
+    finalSolution: explicit || implicitSolution,
+    rhsNode: classification.rhs
+  };
+}
+
+function buildLinearSolution(parsed, classification) {
+  const { aNode, bNode, rhs } = classification;
+  const P = simplifyNode(makeNeg(aNode));
+  const Q = simplifyNode(bNode);
+  const pText = nodeToString(P);
+  const qText = nodeToString(Q);
+  const integralP = integrate(P, 'x');
+  if (!integralP) {
+    throw new Error('انتگرال P(x) به سادگی محاسبه نشد.');
+  }
+  const muNode = simplifyNode(createFunction('exp', cloneNode(integralP)));
+  const muText = nodeToString(muNode);
+  const integralPText = nodeToString(integralP);
+  const muQNode = simplifyNode(makeMul(muNode, Q));
+  const integralMuQ = integrate(muQNode, 'x');
+  const muQText = nodeToString(muQNode);
+  let finalExpression;
+  let integratedMuQText = null;
+  if (integralMuQ) {
+    integratedMuQText = nodeToString(integralMuQ);
+    finalExpression = `y(x) = (${integratedMuQText} + C) / ${muText}`;
+  } else {
+    finalExpression = `y(x) = (1/${muText}) * (∫ (${muQText}) dx + C)`;
+  }
+  const steps = [
+    {
+      title: 'گام ۱: تشخیص معادله خطی مرتبه اول',
+      description: 'معادله را به فرم dy/dx + P(x) y = Q(x) بازنویسی می‌کنیم.'
+    },
+    {
+      title: 'گام ۲: تعیین P(x) و Q(x)',
+      description: 'ضریب y را با علامت منفی به عنوان P(x) و بقیه عبارت را به عنوان Q(x) در نظر می‌گیریم.',
+      equationLine: `P(x) = ${pText}   ،   Q(x) = ${qText}`
+    },
+    {
+      title: 'گام ۳: محاسبه عامل انتگرال‌ساز',
+      description: 'عامل انتگرال‌ساز از رابطه μ(x) = exp(∫ P(x) dx) به دست می‌آید.',
+      equationLine: `μ(x) = exp(${integralPText}) = ${muText}`
+    },
+    {
+      title: 'گام ۴: ضرب طرفین در μ(x)',
+      description: 'با ضرب کل معادله در μ(x)، سمت چپ به مشتق μ(x)·y تبدیل می‌شود.',
+      equationLine: `d/dx [μ(x) · y] = μ(x) · Q(x) = ${muQText}`
+    },
+    {
+      title: 'گام ۵: انتگرال‌گیری نهایی',
+      description: 'از دو طرف نسبت به x انتگرال می‌گیریم تا عبارت μ(x)·y را به دست آوریم.',
+      equationLine: `μ(x) · y = ∫ (${muQText}) dx + C`
+    }
+  ];
+  if (integratedMuQText) {
+    steps.push({
+      title: 'گام ۶: جواب نهایی',
+      description: 'با تقسیم بر μ(x)، پاسخ نهایی به دست می‌آید.',
+      equationLine: finalExpression
+    });
+  } else {
+    steps.push({
+      title: 'گام ۶: فرم کلی پاسخ',
+      description: 'اگر انتگرال سمت راست ساده نباشد، پاسخ را به صورت عمومی نگه می‌داریم.',
+      equationLine: finalExpression
+    });
+  }
+  return {
+    status: 'ok',
+    classification: 'linear',
+    normalizedEquation: parsed.normalizedEquation,
+    hint: 'این معادله خطی مرتبه اول است. با محاسبه عامل انتگرال‌ساز و ضرب در آن می‌توانی حلش کنی.',
+    steps,
+    finalSolution: finalExpression,
+    rhsNode: rhs
+  };
+}
+
+function detectSeparable(rhs) {
+  const factors = flattenProduct(rhs);
+  const xNum = [];
+  const xDen = [];
+  const yNum = [];
+  const yDen = [];
+  const cNum = [];
+  const cDen = [];
+  for (const factor of factors) {
+    const node = factor.node;
+    const inDenominator = factor.denominator;
+    const hasX = dependsOn(node, 'x');
+    const hasY = dependsOn(node, 'y');
+    if (hasX && hasY) {
+      return null;
+    }
+    if (hasY) {
+      if (inDenominator) {
+        yDen.push(node);
+      } else {
+        yNum.push(node);
+      }
+    } else if (hasX) {
+      if (inDenominator) {
+        xDen.push(node);
+      } else {
+        xNum.push(node);
+      }
+    } else {
+      if (inDenominator) {
+        cDen.push(node);
+      } else {
+        cNum.push(node);
+      }
+    }
+  }
+  if (yNum.length === 0 && yDen.length === 0) {
+    return null;
+  }
+  const xPart = buildProduct([...xNum, ...cNum], [...xDen, ...cDen]);
+  const yPart = buildProduct(yNum, yDen);
+  if (!dependsOn(yPart, 'y')) {
+    return null;
+  }
+  return { xPart, yPart };
+}
+
+function detectLinear(rhs) {
+  const terms = flattenSum(rhs);
+  const coefficientTerms = [];
+  const freeTerms = [];
+  for (const term of terms) {
+    if (dependsOn(term, 'y')) {
+      const coeff = extractLinearCoefficient(term);
+      if (!coeff) {
+        return null;
+      }
+      coefficientTerms.push(coeff);
+    } else {
+      freeTerms.push(term);
+    }
+  }
+  if (!coefficientTerms.length) {
+    return null;
+  }
+  const aNode = simplifyNode(sumNodes(coefficientTerms));
+  const bNode = simplifyNode(sumNodes(freeTerms));
+  if (dependsOn(aNode, 'y') || dependsOn(bNode, 'y')) {
+    return null;
+  }
+  return { aNode, bNode };
+}
+
+function extractLinearCoefficient(term) {
+  const factors = flattenProduct(term);
+  const numerator = [];
+  const denominator = [];
+  let yCount = 0;
+  for (const item of factors) {
+    const node = item.node;
+    if (item.denominator) {
+      if (dependsOn(node, 'y')) {
+        return null;
+      }
+      denominator.push(node);
+      continue;
+    }
+    if (isVariableNode(node, 'y')) {
+      yCount += 1;
+      continue;
+    }
+    if (node.type === 'binary' && node.op === '^' && isVariableNode(node.left, 'y') && node.right.type === 'number') {
+      if (Math.abs(node.right.value - 1) < 1e-9) {
+        yCount += 1;
+        continue;
+      }
+      return null;
+    }
+    if (dependsOn(node, 'y')) {
+      return null;
+    }
+    numerator.push(node);
+  }
+  if (yCount !== 1) {
+    return null;
+  }
+  return buildProduct(numerator, denominator);
+}
+
+function buildProduct(numeratorNodes, denominatorNodes) {
+  let result = productOf(numeratorNodes);
+  for (const den of denominatorNodes) {
+    result = makeDiv(result, den);
+  }
+  return simplifyNode(result);
+}
+
+function productOf(nodes) {
+  if (!nodes.length) {
+    return createNumber(1);
+  }
+  return nodes.reduce((acc, node) => (acc ? makeMul(acc, node) : node), null);
+}
+
+function sumNodes(nodes) {
+  if (!nodes.length) {
+    return createNumber(0);
+  }
+  return nodes.reduce((acc, node) => (acc ? makeAdd(acc, node) : node), null);
+}
+
+function deriveExplicitFromSeparable(leftIntegral, rightIntegral) {
+  if (leftIntegral.type === 'function' && leftIntegral.name === 'ln') {
+    const arg = leftIntegral.argument;
+    if (arg.type === 'function' && arg.name === 'abs' && arg.argument && isVariableNode(arg.argument, 'y')) {
+      return `y = C · exp(${nodeToString(rightIntegral)})`;
+    }
+  }
+  return null;
+}
+
+
+
+const equationInput = document.getElementById('equationInput');
+const initialXInput = document.getElementById('initialX');
+const initialYInput = document.getElementById('initialY');
+const hintButton = document.getElementById('hintButton');
+const stepButton = document.getElementById('stepButton');
+const fullButton = document.getElementById('fullButton');
+const resetButton = document.getElementById('resetButton');
+const hintOutput = document.getElementById('hintOutput');
+const stepOutput = document.getElementById('stepOutput');
+const statusMessage = document.getElementById('statusMessage');
+const keyboardContainer = document.getElementById('keyboard');
+const chartCanvas = document.getElementById('solutionChart');
+const chartNotice = document.getElementById('chartNotice');
+const themeToggle = document.getElementById('themeToggle');
+
+initThemeToggle(themeToggle);
+setupVirtualKeyboard(keyboardContainer, equationInput);
+
+let lastEquation = '';
+let currentResult = null;
+let revealedSteps = 0;
+let hintShown = false;
+
+const classificationMap = {
+  direct: 'انتگرال مستقیم',
+  separable: 'جداشدنی',
+  linear: 'خطی مرتبه اول'
+};
+
+equationInput.addEventListener('input', () => {
+  markDirty();
+});
+
+initialXInput.addEventListener('input', () => {
+  updateChartIfReady(false);
+});
+
+initialYInput.addEventListener('input', () => {
+  updateChartIfReady(false);
+});
+
+hintButton.addEventListener('click', () => {
+  if (!ensureResult()) return;
+  if (!currentResult || currentResult.status !== 'ok') return;
+  hintOutput.textContent = currentResult.hint;
+  hintOutput.classList.remove('hidden');
+  hintShown = true;
+});
+
+stepButton.addEventListener('click', () => {
+  if (!ensureResult()) return;
+  if (!currentResult || currentResult.status !== 'ok') return;
+  showNextStep();
+});
+
+fullButton.addEventListener('click', () => {
+  if (!ensureResult()) return;
+  if (!currentResult || currentResult.status !== 'ok') return;
+  stepOutput.innerHTML = '';
+  currentResult.steps.forEach((step) => {
+    stepOutput.appendChild(renderStep(step));
+  });
+  revealedSteps = currentResult.steps.length;
+  stepButton.disabled = true;
+  updateChartIfReady(true);
+});
+
+resetButton.addEventListener('click', () => {
+  equationInput.value = '';
+  initialXInput.value = '';
+  initialYInput.value = '';
+  markDirty();
+});
+
+function ensureResult() {
+  const equation = equationInput.value.trim();
+  if (!equation) {
+    statusMessage.textContent = 'لطفاً ابتدا معادله دیفرانسیل را وارد کن.';
+    return false;
+  }
+  if (equation !== lastEquation || !currentResult) {
+    const result = processEquation(equation);
+    currentResult = result;
+    lastEquation = equation;
+    revealedSteps = 0;
+    hintShown = false;
+    hintOutput.classList.add('hidden');
+    hintOutput.textContent = '';
+    stepOutput.innerHTML = '';
+    stepButton.disabled = false;
+    clearChart(chartCanvas);
+    chartNotice.textContent = '';
+    if (result.status === 'ok') {
+      const label = classificationMap[result.classification] || 'نامشخص';
+      statusMessage.textContent = `معادله تشخیص داده شد: ${label}`;
+    } else {
+      statusMessage.textContent = result.message;
+      return false;
+    }
+  } else if (currentResult.status !== 'ok') {
+    statusMessage.textContent = currentResult.message;
+    return false;
+  }
+  return true;
+}
+
+function showNextStep() {
+  if (!currentResult || currentResult.status !== 'ok') return;
+  if (revealedSteps >= currentResult.steps.length) {
+    stepButton.disabled = true;
+    updateChartIfReady(true);
+    return;
+  }
+  const step = currentResult.steps[revealedSteps];
+  stepOutput.appendChild(renderStep(step));
+  revealedSteps += 1;
+  if (revealedSteps >= currentResult.steps.length) {
+    stepButton.disabled = true;
+    updateChartIfReady(true);
+  }
+}
+
+function renderStep(step) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'step-item';
+  const title = document.createElement('h3');
+  title.textContent = step.title;
+  const description = document.createElement('p');
+  description.textContent = step.description;
+  wrapper.appendChild(title);
+  wrapper.appendChild(description);
+  if (step.equationLine) {
+    const equationLine = document.createElement('div');
+    equationLine.className = 'equation-line';
+    equationLine.textContent = step.equationLine;
+    wrapper.appendChild(equationLine);
+  }
+  return wrapper;
+}
+
+function markDirty() {
+  currentResult = null;
+  lastEquation = '';
+  revealedSteps = 0;
+  hintShown = false;
+  hintOutput.classList.add('hidden');
+  hintOutput.textContent = '';
+  stepOutput.innerHTML = '';
+  statusMessage.textContent = 'منتظر دریافت معادله هستم.';
+  stepButton.disabled = false;
+  clearChart(chartCanvas);
+  chartNotice.textContent = '';
+}
+
+function parseInitialValue(input, fallback) {
+  const value = parseFloat(input.value);
+  if (Number.isFinite(value)) {
+    return value;
+  }
+  return fallback;
+}
+
+function updateChartIfReady(force = false) {
+  if (!currentResult || currentResult.status !== 'ok') {
+    clearChart(chartCanvas);
+    return;
+  }
+  if (!force && revealedSteps < currentResult.steps.length) {
+    return;
+  }
+  const derivative = createDerivativeEvaluator(currentResult.rhsNode);
+  const x0 = parseInitialValue(initialXInput, 0);
+  const y0 = parseInitialValue(initialYInput, 1);
+  const message = renderSolutionChart(chartCanvas, derivative, { x0, y0 });
+  const usedDefaults = !initialXInput.value.trim() || !initialYInput.value.trim();
+  if (message.success) {
+    chartNotice.textContent = usedDefaults
+      ? `${message.notice} (از مقادیر پیش‌فرض x₀ = 0 و y₀ = 1 استفاده شد.)`
+      : message.notice;
+  } else {
+    chartNotice.textContent = message.notice || 'نتوانستم نمودار را رسم کنم.';
+  }
+}
+
+  </script>
 </body>
 </html>
